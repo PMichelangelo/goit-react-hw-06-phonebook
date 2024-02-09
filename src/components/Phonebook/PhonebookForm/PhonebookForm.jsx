@@ -1,27 +1,33 @@
-import { useState } from 'react';
 import { nanoid } from 'nanoid';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  setName,
+  setPhone,
+  clearForm,
+} from '../../../redux/phonebookFrom/phonebookForm-slice';
+import { addContact } from '../../../redux/contacts/contacts-slice';
 import styles from './phonebookForm.module.css';
 
-const PhonebookForm = ({ onSubmit }) => {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+const PhonebookForm = () => {
+  const { name, phone } = useSelector(state => state.phonebookForm);
+
+  const dispatch = useDispatch();
 
   const nameId = nanoid();
   const phoneId = nanoid();
 
   const handleSubmit = e => {
     e.preventDefault();
-    onSubmit({ name, phone });
-    setName('');
-    setPhone('');
+    dispatch(addContact({ name, phone }));
+    dispatch(clearForm());
   };
 
   const handleChange = e => {
     const { name, value } = e.target;
     if (name === 'name') {
-      setName(value);
+      dispatch(setName(value));
     } else if (name === 'phone') {
-      setPhone(value);
+      dispatch(setPhone(value));
     }
   };
 

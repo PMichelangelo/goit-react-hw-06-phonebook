@@ -10,16 +10,24 @@ import styles from './phonebookForm.module.css';
 
 const PhonebookForm = () => {
   const { name, phone } = useSelector(state => state.phonebookForm);
+  const existingContacts = useSelector(state => state.contacts);
 
   const dispatch = useDispatch();
+
 
   const nameId = nanoid();
   const phoneId = nanoid();
 
-  const handleSubmit = e => {
+ const handleSubmit = e => {
     e.preventDefault();
-    dispatch(addContact({ name, phone }));
-    dispatch(clearForm());
+    const formattedName = name.toLowerCase();
+    const isNameExists = existingContacts.some(contact => contact.name.toLowerCase() === formattedName); // Приводим все существующие имена к нижнему регистру перед сравнением
+    if (isNameExists) {
+      alert('This person already in Phonebook');
+    } else {
+      dispatch(addContact({ name, phone }));
+      dispatch(clearForm());
+    }
   };
 
   const handleChange = e => {

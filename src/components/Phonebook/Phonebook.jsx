@@ -2,14 +2,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import PhonebookForm from './PhonebookForm/PhonebookForm';
 import ContactsList from './ContactsList/ContactsList';
 
-import { getFilterdContacts } from '../../redux/contacts/contact-selectors';
+//import { getFilterdContacts } from '../../redux/contacts/contact-selectors';
 import { getFilter } from '../../redux/filter/filter-selectors';
 import { setFilter } from '../../redux/filter/filter-slice';
 
 import styles from './phonebook.module.css';
 
 const Phonebook = () => {
-  const contacts = useSelector(getFilterdContacts);
+  //const contacts = useSelector(getFilterdContacts);
   const filter = useSelector(getFilter);
   const dispatch = useDispatch();
   /*
@@ -37,7 +37,7 @@ const Phonebook = () => {
           onChange={changeFilter}
           className={styles.filter}
         />
-        <ContactsList />
+        <ContactsList/>
       </div>
     </div>
   );

@@ -1,43 +1,71 @@
-import { nanoid } from 'nanoid';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  setName,
-  setPhone,
-  clearForm,
-} from '../../../redux/phonebookFrom/phonebookForm-slice';
+import { nanoid } from 'nanoid';
+
+import { getFilteredContacts } from '../../../redux/contacts/contact-selectors';
 import { addContact } from '../../../redux/contacts/contacts-slice';
 import styles from './phonebookForm.module.css';
 
+const INITIAL_STATE = {
+    contacts: [],
+    filter: '',
+    name: '',
+    phone: ''
+};
+
 const PhonebookForm = () => {
-  const { name, phone } = useSelector(state => state.phonebookForm);
-  const existingContacts = useSelector(state => state.contacts);
+  const [state, setState] = useState({ ...INITIAL_STATE })
+  const contacts = useSelector(getFilteredContacts)
 
   const dispatch = useDispatch();
 
+      const isDublicate = ({ name, phone }) => {
+        const normalizedName = name.toLowerCase();
+        const normalizedNumber = phone.trim();
 
-  const nameId = nanoid();
-  const phoneId = nanoid();
+        const dublicate = contacts.find(item => {
+            const normalizeCurrentName = item.name.toLowerCase();
+            const normalizeCurrentNumber = item.phone.trim();
+            return (normalizeCurrentName === normalizedName || normalizeCurrentNumber === normalizedNumber)
+        })
+
+        return Boolean(dublicate);
+      };
+
+  const onAddContact = (data) => {
+    if (isDublicate(data)) {
+      alert(`${data.name} with number ${data.phone} is already in phonebook`)
+      return
+    }
+
+    const action = addContact(data)
+    dispatch(action)
+  }
+
+    const handleChange = ({target}) => {
+    const { name, value } = target;
+    setState({
+      ...state,
+      [name]: value
+    })
+  };
 
  const handleSubmit = e => {
     e.preventDefault();
-    const formattedName = name.toLowerCase();
-    const isNameExists = existingContacts.some(contact => contact.name.toLowerCase() === formattedName); // Приводим все существующие имена к нижнему регистру перед сравнением
-    if (isNameExists) {
-      alert('This person already in Phonebook');
-    } else {
-      dispatch(addContact({ name, phone }));
-      dispatch(clearForm());
-    }
-  };
+   onAddContact({ ...state })
+   if (!isDublicate({...state})) {
+     reset()
+   }
+ };
 
-  const handleChange = e => {
-    const { name, value } = e.target;
-    if (name === 'name') {
-      dispatch(setName(value));
-    } else if (name === 'phone') {
-      dispatch(setPhone(value));
-    }
-  };
+  const reset = () => {
+    setState({...INITIAL_STATE})
+  }
+
+  const nameId = nanoid()
+  const phoneId = nanoid()
+
+  const {name, phone } = state
 
   return (
     <div className={styles.wrapper}>
@@ -63,6 +91,7 @@ const PhonebookForm = () => {
             className={styles.inputName}
             id={phoneId}
             onChange={handleChange}
+            pattern="^[+0-9\-\(\)\s]+$"
             required
           />
           <button type="submit" className={styles.addContactBtn}>
@@ -70,7 +99,6 @@ const PhonebookForm = () => {
           </button>
         </div>
       </form>
-      <h1>Contacts</h1>
     </div>
   );
 };

@@ -1,1 +1,1 @@
-export const getFilter = store => store.filter
+export const selectFilter = store => store.filter
